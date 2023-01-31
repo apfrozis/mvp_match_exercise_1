@@ -1,8 +1,11 @@
 class UsersController < ApplicationController
+  before_action :authorize_request, except: :create
+
+  skip_before_action :verify_authenticity_token
 
   PERMITTED_DEPOSIT_AMOUNTS = [5, 10, 20, 50, 100].freeze
 
-  before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
+  #before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
 
   def index
 
@@ -11,6 +14,7 @@ class UsersController < ApplicationController
 
   # no auth
   def create
+    # Validate password - number of chars, special_chars, etc
     user = User.create!(params.require(:data).permit(:name, :username, :password, :role))
 
     render status: :ok, json: UserSerializer.record(user)
@@ -35,7 +39,7 @@ class UsersController < ApplicationController
       raise ApplicationController::DepositError, 'Amount not allowed, please deposit 5, 10, 20, 50 and 100 cent'
     end
 
-    current_cash = User.find(params.require(:user_id)).deposit
+    current_cash = User.find(params.require(:user_id)).deposit.to_f
     user = User.find(params.require(:user_id))
     user.update!(deposit: current_cash + params.require(:deposit).to_f)
 

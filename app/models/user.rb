@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+
   has_many :products, dependent: :destroy
 
   enum status: { buyer: 0, seller: 1, }
@@ -6,4 +7,8 @@ class User < ApplicationRecord
   scope :buyer, -> { where(role: 0) }
 
   scope :seller, -> { where(role: 1) }
+
+  def authenticate(password)
+    self.password == password
+  end
 end

@@ -1,4 +1,5 @@
 class ProductsController < ApplicationController
+  before_action :authorize_request, except: [:index]
 
   before_action :user_is_seller, only: SELLER_ONLY_ENDPOINTS
 
