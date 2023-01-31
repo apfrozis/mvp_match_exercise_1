@@ -21,8 +21,8 @@ class ProductsController < ApplicationController
   end
 
   def update
-    Product.update!(params.require(:data).permit(:name, :amount_available, :cost, :user_id))
+    product = Product.find(params.require(:id)).update!(params.require(:data).permit(:name, :amount_available, :cost, :user_id))
 
-    render status: :ok, json: ProductSerializer.record(user)
+    render status: :ok, json: ProductSerializer.record(product)
   end
 end

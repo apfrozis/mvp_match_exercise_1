@@ -22,18 +22,19 @@ class UsersController < ApplicationController
   end
 
   def update
-    User.update!(params.require(:data).permit(:name, :username, :password, :role))
+    user = User.find(params.require(:id))
+    user.update!(params.require(:data).permit(:name, :username, :password, :role))
 
     render status: :ok, json: UserSerializer.record(user)
   end
 
   def deposit
     unless PERMITTED_DEPOSIT_AMOUNTS.include?(params.require(:deposit).to_f)
-      raise DepositError, 'Amount not allowed, please deposit 5, 10, 20, 50 and 100 cent'
+      raise ApplicationController::DepositError, 'Amount not allowed, please deposit 5, 10, 20, 50 and 100 cent'
     end
 
-    current_cash = User.find(params.require(:id)).deposit
-    User.find(params.require(:id)).update!(deposit: current_cash + params.require(:deposit).to_f)
+    current_cash = User.find(params.require(:user_id)).deposit
+    User.find(params.require(:user_id)).update!(deposit: current_cash + params.require(:deposit).to_f)
 
     render status: :ok, json: UserSerializer.record(user)
   end
@@ -41,7 +42,7 @@ class UsersController < ApplicationController
   def buy
     products_amount = params.require(:products_amount).to_i
     product = Product.find(params.require(:product_id))
-    user = User.find(params.require(:id))
+    user = User.find(params.require(:user_id))
 
     if not_enough_money_to_buy(user.deposit, product.cost, products_amount)
       raise DepositError, 'Not enough money to buy product/products'
@@ -53,14 +54,14 @@ class UsersController < ApplicationController
 
     # Verify if product is decimal and raise in that case
     if products_amount < 0
-      raise DepositError, 'Invalid product amount'
+      raise DepositError, "Amount can't be less than 0"
     end
 
     amount_spent = product.cost * products_amount
     user.update!(deposit: user.deposit - amount_spent)
     product.update!(amount_available: product.amount_available - products_amount)
 
-    render status: :ok, json: ProductSerializer.collection(product).merge(amount_spent: amount_spent)
+    render status: :ok, json: ProductSerializer.record(product).merge(amount_spent: amount_spent)
   end
 
   def reset

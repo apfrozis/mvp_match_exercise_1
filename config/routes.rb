@@ -5,4 +5,6 @@ Rails.application.routes.draw do
     put "/buy" => 'users#buy'
     put "/reset" => 'users#reset'
   end
+
+  resources :products
 end
