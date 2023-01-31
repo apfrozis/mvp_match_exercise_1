@@ -16,7 +16,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.destroy!(params.require(:id))
+    User.destroy(params.require(:id))
 
     render status: :no_content
   end
