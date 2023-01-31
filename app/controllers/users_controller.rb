@@ -34,7 +34,8 @@ class UsersController < ApplicationController
     end
 
     current_cash = User.find(params.require(:user_id)).deposit
-    User.find(params.require(:user_id)).update!(deposit: current_cash + params.require(:deposit).to_f)
+    user = User.find(params.require(:user_id))
+    user.update!(deposit: current_cash + params.require(:deposit).to_f)
 
     render status: :ok, json: UserSerializer.record(user)
   end
