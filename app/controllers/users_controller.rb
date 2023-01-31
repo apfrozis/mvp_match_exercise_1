@@ -2,6 +2,8 @@ class UsersController < ApplicationController
 
   PERMITTED_DEPOSIT_AMOUNTS = [5, 10, 20, 50, 100].freeze
 
+  before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
+
   def index
 
     render status: :ok, json: UserSerializer.collection(User.all)
@@ -66,7 +68,7 @@ class UsersController < ApplicationController
   end
 
   def reset
-    User.find(params.require(:id)).update!(deposit: 0)
+    User.find(params.require(:user_id)).update!(deposit: 0)
 
     render status: :ok, json: UserSerializer.record(user)
   end
@@ -79,6 +81,12 @@ class UsersController < ApplicationController
 
   def not_enough_products_available(product_amount_available, product_amount_requested)
     product_amount_requested > product_amount_available
+  end
+
+  def user_is_buyer
+    user = User.buyer.find_by(id: params.require(:user_id))
+
+    raise DepositError, 'User has to be Buyer to perform that action' if user.blank?
   end
 
 end
