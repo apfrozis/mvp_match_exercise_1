@@ -21,25 +21,28 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.destroy(params.require(:id))
+    # get id from current_user or get id from params and create a policy scope
+    User.destroy(@current_user.id)
 
     render status: :no_content
   end
 
   def update
-    user = User.find(params.require(:id))
+    # get id from current_user or get id from params and create a policy scope
+    user = User.find(@current_user.id)
     user.update!(params.require(:data).permit(:name, :username, :password, :role))
 
     render status: :ok, json: UserSerializer.record(user)
   end
 
   def deposit
+    # get id from current_user or get id from params and create a policy scope
     unless PERMITTED_DEPOSIT_AMOUNTS.include?(params.require(:deposit).to_f)
       raise ApplicationController::DepositError, 'Amount not allowed, please deposit 5, 10, 20, 50 and 100 cent'
     end
 
-    current_cash = User.find(params.require(:user_id)).deposit.to_f
-    user = User.find(params.require(:user_id))
+    current_cash = User.find(@current_user.id).deposit.to_f
+    user = User.find(@current_user.id)
     user.update!(deposit: current_cash + params.require(:deposit).to_f)
 
     render status: :ok, json: UserSerializer.record(user)
@@ -47,9 +50,10 @@ class UsersController < ApplicationController
 
   #change to service
   def buy
+    # get id from current_user or get id from params and create a policy scope
     products_amount = params.require(:products_amount).to_i
     product = Product.find(params.require(:product_id))
-    user = User.find(params.require(:user_id))
+    user = User.find(@current_user.id)
 
     if not_enough_money_to_buy(user.deposit, product.cost, products_amount)
       raise DepositError, 'Not enough money to buy product/products'
@@ -67,12 +71,13 @@ class UsersController < ApplicationController
     amount_spent = product.cost * products_amount
     user.update!(deposit: user.deposit - amount_spent)
     product.update!(amount_available: product.amount_available - products_amount)
-    # TODO: missing change
+
     render status: :ok, json: ProductSerializer.record(product).merge(amount_spent: amount_spent)
   end
 
   def reset
-    User.find(params.require(:user_id)).update!(deposit: 0)
+    # get id from current_user or get id from params and create a policy scope
+    User.find(@current_user.id).update!(deposit: 0)
 
     render status: :ok, json: UserSerializer.record(user)
   end

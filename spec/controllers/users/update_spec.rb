@@ -10,6 +10,9 @@ RSpec.describe 'PUT /users/:id', type: :request do
   let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: '0', password: 'teste' }
   } }
 
+  before do
+    allow(JsonWebTokenService).to receive(:decode).with(any_args).and_return({ user_id: user.id })
+  end
 
   context 'with valid sessions' do
 

@@ -5,10 +5,14 @@ require 'rails_helper'
 RSpec.describe 'PUT /users/:id/buy', type: :request do
   let(:endpoint) { "/users/#{user.id}/buy" }
   let(:user) { User.create(name: 'Test', username: 'username', role: 1,
-                           password: 'password', deposit: 10) }
+                           password: 'password', deposit: 10, role: 'buyer') }
   let(:product) { Product.create(name: 'Test Product', amount_available: 1, cost: 5, user: user) }
 
   let(:params) { { products_amount: 1, product_id: product.id } }
+
+  before do
+    allow(JsonWebTokenService).to receive(:decode).with(any_args).and_return({ user_id: user.id })
+  end
 
   context 'expected behavior' do
 

@@ -3,6 +3,7 @@ class ProductsController < ApplicationController
   USER_CREATED_PRODUCT_ONLY_ENDPOINTS = [:update, :destroy].freeze
   before_action :authorize_request, except: [:index]
   before_action :user_is_seller, only: SELLER_ONLY_ENDPOINTS
+  #change to policy scope
   before_action :user_created_product, only: USER_CREATED_PRODUCT_ONLY_ENDPOINTS
 
   def index
@@ -17,12 +18,14 @@ class ProductsController < ApplicationController
   end
 
   def destroy
+    # policy scope
     Product.destroy(params.require(:id))
 
     head :no_content
   end
 
   def update
+    # policy scope
     product = Product.find(params.require(:id))
     product.update!(params.require(:data).permit(:name, :amount_available, :cost, :user_id))
 
