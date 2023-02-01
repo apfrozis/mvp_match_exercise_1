@@ -3,10 +3,6 @@ class ApplicationController < ActionController::Base
 
   class DepositError < StandardError; end
 
-  BUYER_ONLY_ENDPOINTS = [:deposit, :buy, :reset].freeze
-
-  SELLER_ONLY_ENDPOINTS = [:create, :update, :destroy].freeze
-
   rescue_from DepositError do |exception|
     render json: { error: exception.message }, status: :bad_request
   end
@@ -16,7 +12,6 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_request
-    byebug
     header = request.headers['Authorization']
     header = header.split(' ').last if header
     begin
@@ -28,6 +23,4 @@ class ApplicationController < ActionController::Base
       render json: { errors: e.message }, status: :unauthorized
     end
   end
-
-
 end

@@ -1,11 +1,10 @@
 class UsersController < ApplicationController
+  BUYER_ONLY_ENDPOINTS = [:deposit, :buy, :reset].freeze
+  PERMITTED_DEPOSIT_AMOUNTS = [5, 10, 20, 50, 100].freeze
   before_action :authorize_request, except: :create
+  before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
 
   skip_before_action :verify_authenticity_token
-
-  PERMITTED_DEPOSIT_AMOUNTS = [5, 10, 20, 50, 100].freeze
-
-  #before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
 
   def index
 
@@ -46,6 +45,7 @@ class UsersController < ApplicationController
     render status: :ok, json: UserSerializer.record(user)
   end
 
+  #change to service
   def buy
     products_amount = params.require(:products_amount).to_i
     product = Product.find(params.require(:product_id))
@@ -59,7 +59,7 @@ class UsersController < ApplicationController
       raise DepositError, 'Not enough products available'
     end
 
-    # Verify if product is decimal and raise in that case
+    # Verify if products_amount is decimal and raise in that case
     if products_amount < 0
       raise DepositError, "Amount can't be less than 0"
     end
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
     amount_spent = product.cost * products_amount
     user.update!(deposit: user.deposit - amount_spent)
     product.update!(amount_available: product.amount_available - products_amount)
-
+    # TODO: missing change
     render status: :ok, json: ProductSerializer.record(product).merge(amount_spent: amount_spent)
   end
 
