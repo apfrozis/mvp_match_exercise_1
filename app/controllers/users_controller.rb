@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   BUYER_ONLY_ENDPOINTS = [:deposit, :buy, :reset].freeze
-  PERMITTED_DEPOSIT_AMOUNTS = [5, 10, 20, 50, 100].freeze
+  PERMITTED_DEPOSIT_AMOUNTS = [100, 50, 20, 10, 5].freeze
   before_action :authorize_request, except: :create
   before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
 
@@ -71,8 +71,8 @@ class UsersController < ApplicationController
     amount_spent = product.cost * products_amount
     user.update!(deposit: user.deposit - amount_spent)
     product.update!(amount_available: product.amount_available - products_amount)
-
-    render status: :ok, json: ProductSerializer.record(product).merge(amount_spent: amount_spent)
+    render status: :ok, json: ProductSerializer.record(product).merge(amount_spent: amount_spent,
+                                                                      change: calculate_change(user.deposit))
   end
 
   def reset
@@ -90,6 +90,18 @@ class UsersController < ApplicationController
 
   def not_enough_products_available(product_amount_available, product_amount_requested)
     product_amount_requested > product_amount_available
+  end
+
+  def calculate_change(deposit)
+    change_coins = []
+    PERMITTED_DEPOSIT_AMOUNTS.each do |permitted_amount|
+      if deposit >= permitted_amount
+        change_coins << permitted_amount
+        remaining_change = deposit - permitted_amount
+        return change_coins + calculate_change(remaining_change)
+      end
+    end
+    change_coins
   end
 
   def user_is_buyer
