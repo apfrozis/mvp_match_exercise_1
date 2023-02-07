@@ -3,7 +3,7 @@ class CreateUsers < ActiveRecord::Migration[6.1]
     create_table :users do |t|
       t.string :name
       t.string :role
-      t.string :username
+      t.string :username, unique: true
       t.string :password
       t.integer :deposit, default: 0
 

@@ -2,7 +2,7 @@ class ProductsController < ApplicationController
   SELLER_ONLY_ENDPOINTS = [:create, :update, :destroy].freeze
   USER_CREATED_PRODUCT_ONLY_ENDPOINTS = [:update, :destroy].freeze
   before_action :authorize_request, except: [:index]
-  before_action :user_is_seller, only: SELLER_ONLY_ENDPOINTS
+  #before_action :user_is_seller, only: SELLER_ONLY_ENDPOINTS
   #change to policy scope
   before_action :user_created_product, only: USER_CREATED_PRODUCT_ONLY_ENDPOINTS
 
@@ -12,12 +12,14 @@ class ProductsController < ApplicationController
   end
 
   def create
-    product = Product.create!(params.require(:data).permit(:name, :amount_available, :cost, :user_id))
+    product = Product.create!(params.require(:data).permit(:name, :amount_available, :cost)
+                                    .merge(user: @current_user))
 
     render status: :ok, json: ProductSerializer.record(product)
   end
 
   def destroy
+    authorize Product
     # policy scope
     Product.destroy(params.require(:id))
 
@@ -25,9 +27,10 @@ class ProductsController < ApplicationController
   end
 
   def update
+    authorize Product
     # policy scope
     product = Product.find(params.require(:id))
-    product.update!(params.require(:data).permit(:name, :amount_available, :cost, :user_id))
+    product.update!(params.require(:data).permit(:name, :amount_available, :cost))
 
     render status: :ok, json: ProductSerializer.record(product)
   end

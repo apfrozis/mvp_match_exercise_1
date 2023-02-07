@@ -21,7 +21,6 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    # get id from current_user or get id from params and create a policy scope
     User.destroy(@current_user.id)
 
     render status: :no_content

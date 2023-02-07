@@ -1,7 +1,16 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery prepend: true
+  include Pundit::Authorization
 
   class DepositError < StandardError; end
+
+  rescue_from StandardError do |exception|
+    render json: { error: exception.message }, status: :not_implemented
+  end
+
+  rescue_from Pundit::NotAuthorizedError do |exception|
+    render json: { error: exception.message }, status: :unauthorized
+  end
 
   rescue_from DepositError do |exception|
     render json: { error: exception.message }, status: :bad_request
@@ -22,5 +31,9 @@ class ApplicationController < ActionController::Base
     rescue JWT::DecodeError => e
       render json: { errors: e.message }, status: :unauthorized
     end
+  end
+
+  def current_user
+    @current_user
   end
 end
