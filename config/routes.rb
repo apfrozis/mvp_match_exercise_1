@@ -3,10 +3,13 @@ Rails.application.routes.draw do
   post '/login', to: 'authentication#login'
   post '/logout/all', to: 'authentication#logout'
 
-  resources :users do
-    put "/deposit" => 'users#deposit'
-    put "/buy" => 'users#buy'
-    put "/reset" => 'users#reset'
+  resources :users, except: [:update] do
+    collection do
+      put '' => 'users#update'
+      put "/deposit" => 'users#deposit'
+      put "/buy" => 'users#buy'
+      put "/reset" => 'users#reset'
+    end
   end
 
   resources :products

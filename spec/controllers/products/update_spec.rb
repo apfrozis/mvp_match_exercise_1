@@ -4,11 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'PUT /products/:id', type: :request do
   let(:endpoint) { "/products/#{product.id}" }
-  let(:user) { User.create(name: 'Teste', username: 'username', role: 0,
+  let(:user) { User.create(name: 'Teste', username: 'username', role: 'buyer',
+                           password: 'password', deposit: 10) }
+  let(:user_2) { User.create(name: 'Teste', username: 'username_2', role: 'buyer',
                            password: 'password', deposit: 10) }
   let(:product) { Product.create(name: 'Product 1', amount_available: 2, cost: 10, user: user)}
 
-  let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: '0', password: 'teste' }
+  let(:params) { {data: { cost: 20 }
   } }
 
   before do
@@ -22,6 +24,15 @@ RSpec.describe 'PUT /products/:id', type: :request do
 
       expect(response.status).to eq(401)
       expect(JSON.parse(response.body)['error']).to eq('User has to be Seller to perform that action')
+    end
+
+    it 'User cannot perform that action to this product' do
+      user.update(role: 'seller')
+      product.update(user: user_2)
+      put endpoint, params: params
+
+      expect(response.status).to eq(401)
+      expect(JSON.parse(response.body)['error']).to eq('User cannot perform that action to this product')
     end
   end
 

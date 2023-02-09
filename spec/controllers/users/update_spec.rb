@@ -2,12 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PUT /users/:id', type: :request do
-  let(:endpoint) { "/users//#{user.id}" }
-  let(:user) { User.create(name: 'Teste', username: 'username', role: 1,
+RSpec.describe 'PUT /users', type: :request do
+  let(:endpoint) { "/users" }
+  let(:user) { User.create(name: 'Teste', username: 'username', role: 'seller',
                            password: 'password', deposit: 10) }
 
-  let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: '0', password: 'teste' }
+  let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: 'seller', password: 'teste' }
   } }
 
   before do

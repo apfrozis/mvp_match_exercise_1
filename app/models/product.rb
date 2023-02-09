@@ -1,6 +1,8 @@
 class Product < ApplicationRecord
   belongs_to :user
 
+  validates_uniqueness_of :name
+
   validate :multiple_of_5?
 
 

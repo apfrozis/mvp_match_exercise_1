@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   BUYER_ONLY_ENDPOINTS = [:deposit, :buy, :reset].freeze
   PERMITTED_DEPOSIT_AMOUNTS = [100, 50, 20, 10, 5].freeze
   before_action :authorize_request, except: :create
-  before_action :user_is_buyer, only: BUYER_ONLY_ENDPOINTS
 
   skip_before_action :verify_authenticity_token
 
@@ -35,6 +34,7 @@ class UsersController < ApplicationController
   end
 
   def deposit
+    authorize User
     # get id from current_user or get id from params and create a policy scope
     unless PERMITTED_DEPOSIT_AMOUNTS.include?(params.require(:deposit).to_f)
       raise ApplicationController::DepositError, 'Amount not allowed, please deposit 5, 10, 20, 50 and 100 cent'
@@ -49,6 +49,8 @@ class UsersController < ApplicationController
 
   #change to service
   def buy
+    authorize User
+
     # get id from current_user or get id from params and create a policy scope
     products_amount = params.require(:products_amount).to_i
     product = Product.find(params.require(:product_id))
@@ -75,8 +77,9 @@ class UsersController < ApplicationController
   end
 
   def reset
+    user = User.find(@current_user.id)
     # get id from current_user or get id from params and create a policy scope
-    User.find(@current_user.id).update!(deposit: 0)
+    user.update!(deposit: 0)
 
     render status: :ok, json: UserSerializer.record(user)
   end
@@ -101,12 +104,6 @@ class UsersController < ApplicationController
       end
     end
     change_coins
-  end
-
-  def user_is_buyer
-    user = User.buyer.find_by(id: params.require(:user_id))
-
-    raise DepositError, 'User has to be Buyer to perform that action' if user.blank?
   end
 
 end

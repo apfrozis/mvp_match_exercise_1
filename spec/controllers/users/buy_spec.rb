@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PUT /users/:id/buy', type: :request do
-  let(:endpoint) { "/users/#{user.id}/buy" }
+RSpec.describe 'PUT /users/buy', type: :request do
+  let(:endpoint) { "/users/buy" }
   let(:user) { User.create(name: 'Test', username: 'username', role: 1,
                            password: 'password', deposit: 50, role: 'buyer') }
   let(:product) { Product.create(name: 'Test Product', amount_available: 1, cost: 5, user: user) }
@@ -39,7 +39,7 @@ RSpec.describe 'PUT /users/:id/buy', type: :request do
     it 'returns expected result' do
       put endpoint, params: params
       product.reload
-      expected_result = { name: product.name, amount_available: product.amount_available, cost: product.cost,
+      expected_result = { id: product.id, name: product.name, amount_available: product.amount_available, cost: product.cost,
                           user_name: product.user.name }.merge(amount_spent: params[:products_amount] * product.cost,
                                                                change: [20, 20, 5])
       expect(JSON.parse(response.body).symbolize_keys).to eq(expected_result)
