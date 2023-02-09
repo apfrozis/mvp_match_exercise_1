@@ -33,6 +33,9 @@ gem 'jwt'
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '3.1.18', platforms: :ruby
 
+# Enables the encryption of files at rest and attributes on the database
+gem 'symmetric-encryption', '~> 4.3.0'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

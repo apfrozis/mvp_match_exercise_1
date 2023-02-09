@@ -4,7 +4,7 @@ class CreateUsers < ActiveRecord::Migration[6.1]
       t.string :name
       t.string :role
       t.string :username, unique: true
-      t.string :password
+      t.string :encrypted_password
       t.integer :deposit, default: 0
 
 

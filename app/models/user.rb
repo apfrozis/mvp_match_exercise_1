@@ -8,6 +8,10 @@ class User < ApplicationRecord
   validates :password, format: { with: /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,}$/ ,
                                  message: 'Not valid password. Must be at least 6 characters and include one number and one letter.', multiline: true}
 
+  attr_encrypted :password, random_iv: true
+
+  validates :encrypted_password, symmetric_encryption: true
+
   scope :buyer, -> { where(role: 'buyer') }
 
   scope :seller, -> { where(role: 'seller') }
