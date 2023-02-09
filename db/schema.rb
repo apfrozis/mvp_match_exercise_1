@@ -35,8 +35,8 @@ ActiveRecord::Schema.define(version: 2023_02_01_185959) do
     t.string "name"
     t.string "role"
     t.string "username"
-    t.string "password"
-    t.integer "deposit"
+    t.string "password_digest"
+    t.integer "deposit", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
