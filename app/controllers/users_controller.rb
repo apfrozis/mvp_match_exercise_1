@@ -28,6 +28,7 @@ class UsersController < ApplicationController
   def update
     # get id from current_user or get id from params and create a policy scope
     user = User.find(@current_user.id)
+
     user.update!(params.require(:data).permit(:name, :username, :password, :role))
 
     render status: :ok, json: UserSerializer.record(user)

@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe 'PUT /users', type: :request do
   let(:endpoint) { "/users" }
   let(:user) { User.create(name: 'Teste', username: 'username', role: 'seller',
-                           password: 'password', deposit: 10) }
+                           password: 'password1', deposit: 10) }
 
-  let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: 'seller', password: 'teste' }
+  let(:params) { {data: { name: 'Teste 2.0', username: 'username 2.0', role: 'seller', password: 'password2' }
   } }
 
   before do

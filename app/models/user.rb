@@ -1,21 +1,12 @@
 class User < ApplicationRecord
-  has_secure_password
+  #has_secure_password
   has_many :products, dependent: :destroy
   has_many :sessions, dependent: :destroy
 
-  PASSWORD_REQUIREMENTS = /\A
-    (?=.{8,}) # At least 8 characters long
-    (?=.*\d) # Contain at least one number
-    (?=.*[a-z]) # Contain at least one lowercase letter
-    (?=.*[A-Z]) # Contain at least one uppercase letter
-    (?=.*[[:^alnum:]]) # Contain at least one symbol
-  /x
-
   validates_uniqueness_of :username
   validates :role, inclusion: %w[seller buyer]
-  validates :password, format: PASSWORD_REQUIREMENTS,
-            acceptance: { message: 'Password has to be 8 chars long, contain at least one number, ' \
-                                   'contain at least one lowercase and one uppercase letter and contain at least one symbol' }
+  validates :password, format: { with: /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,}$/ ,
+                                 message: 'Not valid password. Must be at least 6 characters and include one number and one letter.', multiline: true}
 
   scope :buyer, -> { where(role: 'buyer') }
 

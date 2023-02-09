@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'PUT /users/deposit', type: :request do
   let(:endpoint) { "/users/deposit" }
   let(:user) { User.create(name: 'Teste', username: 'username', role: 1,
-                           password: 'password', deposit: 10, role: 'buyer') }
+                           password: 'password1', deposit: 10, role: 'buyer') }
   let(:product) { Product.create(name: 'Test Product', amount_available: 1, cost: 5, user: user) }
 
   before do

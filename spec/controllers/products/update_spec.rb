@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'PUT /products/:id', type: :request do
   let(:endpoint) { "/products/#{product.id}" }
   let(:user) { User.create(name: 'Teste', username: 'username', role: 'buyer',
-                           password: 'password', deposit: 10) }
+                           password: 'password1', deposit: 10) }
   let(:user_2) { User.create(name: 'Teste', username: 'username_2', role: 'buyer',
                            password: 'password', deposit: 10) }
   let(:product) { Product.create(name: 'Product 1', amount_available: 2, cost: 10, user: user)}
